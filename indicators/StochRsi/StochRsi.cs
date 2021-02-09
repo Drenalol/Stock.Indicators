@@ -14,15 +14,16 @@ namespace Skender.Stock.Indicators
             int rsiPeriod,
             int stochPeriod,
             int signalPeriod,
-            int smoothPeriod = 1)
+            int smoothPeriod = 1,
+            int? minimalPeriods = null)
             where TQuote : IQuote
         {
 
             // check parameter arguments
-            ValidateStochRsi(history, rsiPeriod, stochPeriod, signalPeriod, smoothPeriod);
+            ValidateStochRsi(history, rsiPeriod, stochPeriod, signalPeriod, smoothPeriod, minimalPeriods);
 
             // initialize
-            List<RsiResult> rsiResults = GetRsi(history, rsiPeriod).ToList();
+            List<RsiResult> rsiResults = GetRsi(history, rsiPeriod, minimalPeriods).ToList();
             List<StochRsiResult> results = new List<StochRsiResult>(rsiResults.Count);
 
             // convert rsi to quote format
@@ -38,7 +39,7 @@ namespace Skender.Stock.Indicators
                 .ToList();
 
             // get Stochastic of RSI
-            List<StochResult> stoResults = GetStoch(rsiQuotes, stochPeriod, signalPeriod, smoothPeriod).ToList();
+            List<StochResult> stoResults = GetStoch(rsiQuotes, stochPeriod, signalPeriod, smoothPeriod, minimalPeriods).ToList();
 
             // compose
             for (int i = 0; i < rsiResults.Count; i++)
@@ -71,7 +72,8 @@ namespace Skender.Stock.Indicators
             int rsiPeriod,
             int stochPeriod,
             int signalPeriod,
-            int smoothPeriod)
+            int smoothPeriod,
+            int? minimalPeriods)
             where TQuote : IQuote
         {
 
@@ -102,7 +104,7 @@ namespace Skender.Stock.Indicators
 
             // check history
             int qtyHistory = history.Count();
-            int minHistory = Math.Max(rsiPeriod + stochPeriod, rsiPeriod + 100);
+            int minHistory = minimalPeriods ?? Math.Max(rsiPeriod + stochPeriod, rsiPeriod + 100);
             if (qtyHistory < minHistory)
             {
                 string message = "Insufficient history provided for Stochastic RSI.  " +

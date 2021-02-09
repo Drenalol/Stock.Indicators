@@ -10,7 +10,8 @@ namespace Skender.Stock.Indicators
         /// 
         public static IEnumerable<RsiResult> GetRsi<TQuote>(
             IEnumerable<TQuote> history,
-            int lookbackPeriod = 14)
+            int lookbackPeriod = 14,
+            int? minimalPeriods = null)
             where TQuote : IQuote
         {
 
@@ -18,15 +19,15 @@ namespace Skender.Stock.Indicators
             List<BasicData> bdList = history.ConvertToBasic("C");
 
             // calculate
-            return CalcRsi(bdList, lookbackPeriod);
+            return CalcRsi(bdList, lookbackPeriod, minimalPeriods);
         }
 
 
-        private static IEnumerable<RsiResult> CalcRsi(List<BasicData> bdList, int lookbackPeriod = 14)
+        private static IEnumerable<RsiResult> CalcRsi(List<BasicData> bdList, int lookbackPeriod = 14, int? minimalPeriods = null)
         {
 
             // check parameter arguments
-            ValidateRsi(bdList, lookbackPeriod);
+            ValidateRsi(bdList, lookbackPeriod, minimalPeriods);
 
             // initialize
             decimal lastValue = bdList[0].Value;
@@ -95,7 +96,8 @@ namespace Skender.Stock.Indicators
 
         private static void ValidateRsi(
             List<BasicData> history,
-            int lookbackPeriod)
+            int lookbackPeriod,
+            int? minimalPeriods)
         {
 
             // check parameter arguments
@@ -107,7 +109,7 @@ namespace Skender.Stock.Indicators
 
             // check history
             int qtyHistory = history.Count;
-            int minHistory = lookbackPeriod + 100;
+            int minHistory = minimalPeriods ?? lookbackPeriod + 100;
             if (qtyHistory < minHistory)
             {
                 string message = "Insufficient history provided for RSI.  " +
