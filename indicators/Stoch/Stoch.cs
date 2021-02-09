@@ -13,7 +13,8 @@ namespace Skender.Stock.Indicators
             IEnumerable<TQuote> history,
             int lookbackPeriod = 14,
             int signalPeriod = 3,
-            int smoothPeriod = 3)
+            int smoothPeriod = 3,
+            int? minimalPeriods = null)
             where TQuote : IQuote
         {
 
@@ -21,7 +22,7 @@ namespace Skender.Stock.Indicators
             List<TQuote> historyList = history.Sort();
 
             // check parameter arguments
-            ValidateStoch(history, lookbackPeriod, signalPeriod, smoothPeriod);
+            ValidateStoch(history, lookbackPeriod, signalPeriod, smoothPeriod, minimalPeriods);
 
             // initialize
             int size = historyList.Count;
@@ -141,7 +142,8 @@ namespace Skender.Stock.Indicators
             IEnumerable<TQuote> history,
             int lookbackPeriod,
             int signalPeriod,
-            int smoothPeriod)
+            int smoothPeriod,
+            int? minimalPeriods)
             where TQuote : IQuote
         {
 
@@ -166,7 +168,7 @@ namespace Skender.Stock.Indicators
 
             // check history
             int qtyHistory = history.Count();
-            int minHistory = lookbackPeriod + smoothPeriod;
+            int minHistory = minimalPeriods ?? lookbackPeriod + smoothPeriod;
             if (qtyHistory < minHistory)
             {
                 string message = "Insufficient history provided for Stochastic.  " +
